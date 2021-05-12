@@ -4,8 +4,9 @@ Created on Sat May  8 21:08:49 2021
 
 @author: almog
 """
- 
+  
 #places text
+#Import the places text
 places_Path="C:/Users/almog/Desktop/PythonMatalot/matala4/dests.txt"
 places_text = open(places_Path,"r",encoding= "utf-8")
 key=input('enter your API Key :')
@@ -52,35 +53,45 @@ def get_lag_and_len(destenation):
         print("something went worng with requests.get")
 
 def create_tupels_for_place(place):#create a function for tupels
-    distance=('Distance: ',(get_distance_and_time(place)['distance']))
-    distance=''.join(distance)
-    time=('Time: ',(get_distance_and_time(place)['time']))
-    time=''.join(time)
-    lng=('Length: ',str((get_lag_and_len(place)['lng'])))
-    lng=''.join(lng)
-    lat=('Latitude: ',str((get_lag_and_len(place)['lat'])))
-    lat=''.join(lat)
-    return distance,time,lng,lat
+    try:
+        distance=('Distance: ',(get_distance_and_time(place)['distance']))
+        distance=''.join(distance)
+        time=('Time: ',(get_distance_and_time(place)['time']))
+        time=''.join(time)
+        lng=('Length: ',str((get_lag_and_len(place)['lng'])))
+        lng=''.join(lng)
+        lat=('Latitude: ',str((get_lag_and_len(place)['lat'])))
+        lat=''.join(lat)    
+        return distance,time,lng,lat
+    except:
+        return ['not a real place'] #if its not a real place
 
 places_dictionary=dict()#creating the full data dictionary 
 find_farest_places=dict()
 for place in places_text:
     if place not in places_dictionary:
-        places_dictionary[place.rstrip()]=(create_tupels_for_place(place))
-        find_farest_places[place.rstrip()]=(places_dictionary[place.rstrip()][0])
+        try:
+            places_dictionary[place.rstrip()]=(create_tupels_for_place(place))
+            find_farest_places[place.rstrip()]=(places_dictionary[place.rstrip()][0])
+        except: 
+            places_dictionary[place.rstrip()]=[]
+            find_farest_places[place.rstrip()]=[]
     else: continue  
         
 for place in places_dictionary: #print the dictinary city after city
     print(place,':' ,places_dictionary[place])
     
-#print(places_dictionary) #print the full dictinary 
+#print(places_dictionary) #print the full dictinary
 
 #find the 3 farest from tel aviv
 tmp=list() 
 for k,v in find_farest_places.items():
-    tmp.append((v,k))    
+    if 'not a real place'in v:continue
+    else:
+        tmp.append((v,k))    
 tmp=sorted(tmp)[len(tmp)-3:] #taking the farest 3
 count=1
 for i in tmp:
     print("place:", count, "the city -", i[1] ,"with " , i[0] ," from Tel Aviv")
     count=count+1
+     
